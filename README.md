@@ -55,4 +55,153 @@
                 free(machine);
                 return platform;
         }
+2. 手机系统版本
+代码：
+        //device system version
+        + (NSString *) getSystemVersion {
+                return [NSString stringWithFormat:@"%@",[UIDevice
+                        currentDevice].systemVersion]; 
+        }
 
+3. 硬盘存储容量
+代码：
+        //file system size
+        +(NSString *)getDiskSize {
+                int64_t space = -1;
+                NSError *error = nil;
+                NSDictionary *attrs = [[NSFileManager defaultManager]
+                        attributesOfFileSystemForPath:NSHomeDirectory() error:&error];
+                if (!error) {
+                        space = [[attrs objectForKey:NSFileSystemSize] longLongValue];
+                }
+                if(space < 0) { 
+                        space = -1;
+                }
+                return [NSString stringWithFormat:@"%lld",space];
+        }
+4. 运营商信息
+代码：
+                //carrier
+                +(NSString* )getCarrierName {
+                        #if TARGET_IPHONE_SIMULATOR
+                                return @"SIMULATOR";
+                        #else
+                        static dispatch_queue_t _queue;
+                        static dispatch_once_t once;
+                        dispatch_once(&once, ^{
+                                _queue = dispatch_queue_create([[NSString stringWithFormat:@"com.carr.%@", self] UTF8String], NULL);
+                        });
+                        __block NSString *  carr = nil;
+                        dispatch_semaphore_t semaphore = dispatch_semaphore_create(0);
+                        dispatch_async(_queue, ^(){
+                                CTTelephonyNetworkInfo *info = [[CTTelephonyNetworkInfo alloc] init]; CTCarrier *carrier = nil;
+                                if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 12.1) {
+                                        if ([info respondsToSelector:@selector(serviceSubscriberCellularProviders)]) { #pragma clang diagnostic push
+                                                #pragma clang diagnostic ignored "-Wunguarded-availability-new"
+                                                NSArray *carrierKeysArray = [info.serviceSubscriberCellularProviders.allKeys
+                                                        sortedArrayUsingSelector:@selector(compare:)];
+                                                carrier = info.serviceSubscriberCellularProviders[carrierKeysArray.firstObject]; 
+                                                if (!carrier.mobileNetworkCode) {
+                                                        carrier = info.serviceSubscriberCellularProviders[carrierKeysArray.lastObject];
+                                                }
+                                                #pragma clang diagnostic pop
+                                        } 
+                                }
+                                if(!carrier) {
+                                        #pragma clang diagnostic push
+                                        #pragma clang diagnostic ignored "-Wdeprecated-declarations"
+                                        carrier = info.subscriberCellularProvider; #pragma clang diagnostic pop
+                                }
+                                if (carrier != nil) {
+                                        NSString *networkCode = [carrier mobileNetworkCode];
+                                        NSString *countryCode = [carrier mobileCountryCode];
+                                        if (countryCode && [countryCode isEqualToString:@"460"] &&networkCode) {
+                                                if ([networkCode isEqualToString:@"00"] || [networkCode isEqualToString:@"02"] || [networkCode isEqualToString:@"07"] || [networkCode isEqualToString:@"08"]) {
+                                                        carr= @"中国移动"; 
+                                                }
+                                                if ([networkCode isEqualToString:@"01"] || [networkCode isEqualToString:@"06"] || [networkCode isEqualToString:@"09"]) {
+                                                        carr= @"中国联通"; 
+                                                }
+                                                if ([networkCode isEqualToString:@"03"] || [networkCode isEqualToString:@"05"] || [networkCode isEqualToString:@"11"]) {
+                                                        carr= @"中国电信"; 
+                                                }
+                                                if ([networkCode isEqualToString:@"04"]) { 
+                                                        carr= @"中国卫通";
+                                                }
+                                                if ([networkCode isEqualToString:@"20"]) {
+                                                        carr= @"中国铁通"; 
+                                                }
+                                        }else {
+                                                carr = [carrier.carrierName copy];
+                                        } 
+                                }
+                                if (carr.length <= 0) { 
+                                        carr = @"unknown";
+                                }
+                                dispatch_semaphore_signal(semaphore);
+                        });
+                        dispatch_time_t t = dispatch_time(DISPATCH_TIME_NOW, 0.5* NSEC_PER_SEC);
+ 
+5.系统版本更新时间 代码:
+  //system update time
++(NSString *)getSysU {
+    NSString *result = nil;
+    NSString *information =
+@"L3Zhci9tb2JpbGUvTGlicmFyeS9Vc2VyQ29uZmlndXJhdGlvblByb2ZpbGVzL1B1YmxpY0luZm8vTU
+NNZXRhLnBsaXN0";
+    NSData *data=[[NSData alloc]initWithBase64EncodedString:information
+options:0];
+    NSString *dataString = [[NSString alloc]initWithData:data
+encoding:NSUTF8StringEncoding];
+    NSError *error = nil;
+    NSDictionary *fileAttributes = [[NSFileManager defaultManager]
+attributesOfItemAtPath:dataString error:&error];
+    if (fileAttributes) {
+        id singleAttibute = [fileAttributes objectForKey:NSFileCreationDate];
+        if ([singleAttibute isKindOfClass:[NSDate class]]) {
+            NSDate *dataDate = singleAttibute;
+            result = [NSString stringWithFormat:@"%f",[dataDate
+timeIntervalSince1970]];
+} }
+    return result;
+}
+6.手机开机时间(会有秒级误差?) 代码:
+      dispatch_semaphore_wait(semaphore, t);
+    return [carr copy];
+#endif
+}
+//system boot time
++(NSString *) getSysB {
+struct timeval boottime;
+int mib[2] = {CTL_KERN, KERN_BOOTTIME};
+size_t size = sizeof(boottime);
+time_t uptime = -1;
+if (sysctl(mib, 2, &boottime, &size, NULL, 0) != -1 && boottime.tv_sec != 0) {
+uptime = boottime.tv_sec; }
+    NSString *result = [NSString stringWithFormat:@"%ld",uptime];
+    return result;
+}
+  
+7.手机用户名摘要(MD5后上报) 代码:
+//device user name
++(NSString *) getDeviceUName {
+    NSString *result = [NSString stringWithFormat:@"%@",[UIDevice
+currentDevice].name];
+return [[self class] getMD5:result ? result : @"unknown"];
+}
+8.手机国家代码 代码:
+//country coude
++(NSString *)getCountryCode {
+    NSLocale *currentLocale = [NSLocale currentLocale];
+    NSString *countryCode = [currentLocale objectForKey:NSLocaleCountryCode];
+    return countryCode;
+}
+9.设备内存大小 代码:
+//device RAM
++(NSString *)getRAM {
+    size_t size = sizeof(int);
+    int results;
+    int mib[2] = {CTL_HW, HW_PHYSMEM};
+    sysctl(mib, 2, &results, &size, NULL, 0);
+    return [NSString stringWithFormat:@"%d",results];
+}
