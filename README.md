@@ -7,7 +7,7 @@ CAID的生成，不采集隐私数据，仅传输加密后的结果，且加密�
 
 # 相关参数获取
 ## 所需头文件
-···
+···Objective-C
 #import <Foundation/Foundation.h>
 #import <sys/sysctl.h>
 #import <UIKit/UIDevice.h>
@@ -17,7 +17,7 @@ CAID的生成，不采集隐私数据，仅传输加密后的结果，且加密�
 
 1. 手机型号
 代码：
-‘’‘
+‘’‘Objective-C
 //device model
 + (NSString *) getDeviceModel {
     size_t size;
