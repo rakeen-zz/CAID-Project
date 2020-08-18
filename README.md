@@ -55,12 +55,12 @@
                 free(machine);
                 return platform;
         }
+        
 2. 手机系统版本
 代码：
         //device system version
         + (NSString *) getSystemVersion {
-                return [NSString stringWithFormat:@"%@",[UIDevice
-                        currentDevice].systemVersion]; 
+                return [NSString stringWithFormat:@"%@",[UIDevice currentDevice].systemVersion]; 
         }
 
 3. 硬盘存储容量
