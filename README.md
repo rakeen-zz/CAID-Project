@@ -24,15 +24,16 @@ CAID的生成，不采集隐私数据，仅传输加密后的结果，且加密�
 
 1. 手机型号
 代码：
-‘’‘Objective-C
-//device model
-+ (NSString *) getDeviceModel {
-    size_t size;
-sysctlbyname("hw.machine", NULL, &size, NULL, 0);
-char *machine = malloc(size);
-sysctlbyname("hw.machine", machine, &size, NULL, 0); NSString *platform = [NSString stringWithCString:machine
-encoding:NSUTF8StringEncoding];
-    free(machine);
-    return platform;
-}
-’‘’
+
+        //device model
+        + (NSString *) getDeviceModel {
+                size_t size;
+                sysctlbyname("hw.machine", NULL, &size, NULL, 0);
+                char *machine = malloc(size);
+                sysctlbyname("hw.machine", machine, &size, NULL, 0); 
+                NSString *platform = [NSString stringWithCString:machine
+                        encoding:NSUTF8StringEncoding];
+                free(machine);
+                return platform;
+        }
+
