@@ -7,18 +7,18 @@ CAID的生成，不采集隐私数据，仅传输加密后的结果，且加密�
 
 # 相关参数获取
 ## 所需头文件
-`
-#import <Foundation/Foundation.h>  
 
-#import <sys/sysctl.h>  
+        #import <Foundation/Foundation.h>  
 
-#import <UIKit/UIDevice.h>  
+        #import <sys/sysctl.h>  
 
-#import <CoreTelephony/CTTelephonyNetworkInfo.h>  
+        #import <UIKit/UIDevice.h>  
 
-#import <CoreTelephony/CTCarrier.h>  
+        #import <CoreTelephony/CTTelephonyNetworkInfo.h>  
 
-#import <CommonCrypto/CommonDigest.h>
+        #import <CoreTelephony/CTCarrier.h>  
+
+        #import <CommonCrypto/CommonDigest.h>
 
 `
 
