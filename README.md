@@ -210,9 +210,9 @@
 
         //device RAM
         +(NSString *)getRAM {
-                size_t size = sizeof(int);
-                int results;
+                size_t size = sizeof(long);
+                unsigned long results;
                 int mib[2] = {CTL_HW, HW_PHYSMEM};
                 sysctl(mib, 2, &results, &size, NULL, 0);
-                return [NSString stringWithFormat:@"%d",results];
+                return [NSString stringWithFormat:@"%lu",results];
         }
