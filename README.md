@@ -210,9 +210,7 @@
 
         //device RAM
         +(NSString *)getRAM {
-                size_t size = sizeof(long);
-                unsigned long results;
-                int mib[2] = {CTL_HW, HW_PHYSMEM};
-                sysctl(mib, 2, &results, &size, NULL, 0);
-                return [NSString stringWithFormat:@"%lu",results];
+                unsigned long long physicalMemory = [[NSProcessInfo processInfo] physicalMemory];
+                NSString *strResult = [NSString stringWithFormat:@"%llu",physicalMemory];
+                return [strResult copy];
         }
